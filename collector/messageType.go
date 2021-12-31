@@ -7,10 +7,12 @@ type file struct {
 	paths      []*filePath
 }
 type filePath struct {
-	path   string
-	folder []string
-	suffix []string
-	saveTo string
+	account string
+	pwd     string
+	path    string
+	folder  []string
+	suffix  []string
+	saveTo  string
 }
 
 type api struct {

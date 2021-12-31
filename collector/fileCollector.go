@@ -5,14 +5,6 @@ import (
 	"reflect"
 )
 
-type fileCollector struct {
-	data file
-}
-
-func (f *fileCollector) run() {
-	//todo 文件从远程拉取到本地
-}
-
 func fileCollectorRunner(msg map[string]interface{}) error {
 	collector := new(fileCollector)
 	err := collector.msgValid(msg)
@@ -21,11 +13,16 @@ func fileCollectorRunner(msg map[string]interface{}) error {
 	}
 	// todo map2struct package
 	collector.assignment(msg)
-	if err != nil {
-		return err
-	}
 	collector.run()
 	return nil
+}
+
+type fileCollector struct {
+	data file
+}
+
+func (f *fileCollector) run() {
+	//todo 文件从远程拉取到本地
 }
 
 func (f *fileCollector) assignment(msg map[string]interface{}) {
@@ -48,6 +45,8 @@ func (f *fileCollector) assignment(msg map[string]interface{}) {
 			filePathData.suffix = append(filePathData.suffix, suffixItem.(string))
 		}
 		filePathData.saveTo = m["saveTo"].(string)
+		filePathData.account = m["account"].(string)
+		filePathData.pwd = m["pwd"].(string)
 		fileData.paths = append(fileData.paths, filePathData)
 	}
 	f.data = fileData
@@ -133,6 +132,20 @@ func (f *fileCollector) msgValid(msg map[string]interface{}) error {
 		}
 		if reflect.TypeOf(p["saveTo"]).String() != "string" {
 			return errors.New("paths.saveTo field not string type")
+		}
+		_, ok = p["account"]
+		if !ok {
+			return errors.New("paths.account field not exist")
+		}
+		if reflect.TypeOf(p["account"]).String() != "string" {
+			return errors.New("paths.account field not string type")
+		}
+		_, ok = p["pwd"]
+		if !ok {
+			return errors.New("paths.pwd field not exist")
+		}
+		if reflect.TypeOf(p["pwd"]).String() != "string" {
+			return errors.New("paths.pwd field not string type")
 		}
 	}
 	return nil
