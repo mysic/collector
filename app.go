@@ -30,10 +30,10 @@ func main() {
 	defer func() {
 		log.Println("collector exiting...")
 		_, err := os.Stat(Address)
-		if err != nil && os.IsExist(err) {
-			err = syscall.Unlink(Address)
-			if err != nil {
-				log.Println("unlink sock file err: " + err.Error())
+		if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
+			log.Println("unlink sock file err: " + err.Error())
+			if os.IsExist(err) {
+				err = syscall.Unlink(Address)
 			}
 		}
 		log.Println("collector exited")

@@ -8,7 +8,7 @@ import (
 func Run(m string) error {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Printf("Panicing %s\r\n", r)
+			log.Printf("paniking: %s\r\n", r)
 		}
 	}()
 	msg := make(map[string]interface{})

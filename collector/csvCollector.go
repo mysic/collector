@@ -8,7 +8,10 @@ func csvCollectorRunner(msg map[string]interface{}) error {
 		return err
 	}
 	collector.fileCollector.assignment(msg)
-	collector.fileCollector.run()
+	err = collector.fileCollector.run()
+	if err != nil {
+		return err
+	}
 	err = collector.run()
 	if err != nil {
 		return err
@@ -21,7 +24,14 @@ type csvCollector struct {
 	data file
 }
 
-func (csv *csvCollector) run() error {
+func (c *csvCollector) run() error {
 
+	//filePath := ""
+	//file, err := os.Open(filePath)
+	//if err != nil {
+	//	return err
+	//}
+	//defer file.Close()
+	//reader := csv.NewReader(file)
 	return nil
 }

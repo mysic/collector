@@ -11,18 +11,67 @@ func fileCollectorRunner(msg map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	// todo map2struct package
 	collector.assignment(msg)
-	collector.run()
-	return nil
+	return collector.run()
 }
 
 type fileCollector struct {
 	data file
 }
 
-func (f *fileCollector) run() {
-	//todo 文件从远程拉取到本地
+func (f *fileCollector) run() error {
+	//todo 通过SFTP文件从远程拉取到本地
+
+	// todo my blog
+	// ssh
+	//config := &ssh.ClientConfig{
+	//	User: "root",
+	//	Auth: []ssh.AuthMethod{
+	//		ssh.Password("eia3920@e208tset"),
+	//	},
+	//	HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	//}
+	//sshClient, err := ssh.Dial("tcp", "47.119.146.28:22", config)
+	//if err != nil {
+	//	return err
+	//}
+
+	//session, err := client.NewSession()
+	//if err != nil {
+	//	return err
+	//}
+	//defer func(session *ssh.Session) {
+	//	err := session.Close()
+	//	if err != nil && err.Error() != "EOF" {
+	//	}
+	//}(session)
+	//var buf bytes.Buffer
+	//session.Stdout = &buf
+	//if err := session.Run("ls -al"); err != nil {
+	//	return err
+	//}
+	//fmt.Println(buf.String())
+
+	// sftp
+	//newClient, err := sftp.NewClient(client)
+	//if err != nil {
+	//	return err
+	//}
+
+	// scp
+	//var scpClient scp.Client
+	//scpClient, err = scp.NewClientBySSH(sshClient)
+	//if err != nil {
+	//	return err
+	//}
+	//defer scpClient.Close()
+	//var localFile os.File
+	//localFile, err = os.Open(localFile)
+	//defer localFile.Close()
+
+	//err = scpClient.CopyFromRemote()
+
+	return nil
 }
 
 func (f *fileCollector) assignment(msg map[string]interface{}) {
@@ -30,7 +79,7 @@ func (f *fileCollector) assignment(msg map[string]interface{}) {
 	fileData.date = msg["date"].(string)
 	fileData.sourceId = msg["source_id"].(string)
 	fileData.sourceType = msg["source_type"].(string)
-	// interface转换过程 需记录
+	// todo blog interface转换过程 需记录
 	paths := msg["paths"].([]interface{})
 	for _, item := range paths {
 		m := item.(map[string]interface{})
@@ -54,7 +103,7 @@ func (f *fileCollector) assignment(msg map[string]interface{}) {
 }
 
 func (f *fileCollector) msgValid(msg map[string]interface{}) error {
-	// todo 记录interface转其他类型的一些经验
+	// todo blog interface转其他类型的一些经验
 	_, ok := msg["date"]
 	if !ok {
 		return errors.New("date field not exist")
