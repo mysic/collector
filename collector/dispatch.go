@@ -2,6 +2,7 @@ package collector
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 )
 
@@ -11,6 +12,7 @@ func Run(m string) error {
 			log.Printf("paniking: %s\r\n", r)
 		}
 	}()
+	log.Println("dispatch request, init collector...")
 	msg := make(map[string]interface{})
 	err := json.Unmarshal([]byte(m), &msg)
 	if err != nil {
@@ -28,6 +30,7 @@ func Run(m string) error {
 	case "csv":
 		return csvCollectorRunner(msg)
 	default:
-		return nil
+		str, _ := msg["source_type"].(string)
+		return errors.New("source type isn't exist: " + str)
 	}
 }

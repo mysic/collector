@@ -1,6 +1,9 @@
 package collector
 
+import "log"
+
 func csvCollectorRunner(msg map[string]interface{}) error {
+	log.Println("csvCollector init...")
 	fileCollector := new(fileCollector)
 	collector := csvCollector{fileCollector: fileCollector}
 	err := collector.fileCollector.msgValid(msg)
@@ -25,7 +28,7 @@ type csvCollector struct {
 }
 
 func (c *csvCollector) run() error {
-
+	log.Println("csvCollector run...")
 	//filePath := ""
 	//file, err := os.Open(filePath)
 	//if err != nil {

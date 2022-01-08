@@ -14,13 +14,34 @@ import (
 )
 
 const (
-	Timezone = "Asia/Shanghai"
-	Address  = "/tmp/collector.sock"
 	Network  = "unix"
-	LogFile  = "/var/log/etl/collector.log"
+	Timezone = "Asia/Shanghai"
+	PidFile  = "/tmp/collector.pid"
+	SockFile = "/tmp/collector.sock"
+	LogFile  = "/var/log/collector.log"
 )
 
 func main() {
+	_, err := os.Stat(PidFile)
+	if err == nil {
+		fmt.Println("collector is running...")
+		os.Exit(0)
+	}
+	pidFile, err := os.OpenFile(PidFile, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		fmt.Println(err.Error())
+		log.Println(err.Error())
+	}
+	defer func() {
+		err := pidFile.Close()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		err = os.Remove(PidFile)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}()
 	location, err := time.LoadLocation(Timezone)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -29,11 +50,11 @@ func main() {
 	time.Local = location
 	defer func() {
 		log.Println("collector exiting...")
-		_, err := os.Stat(Address)
+		_, err := os.Stat(SockFile)
 		if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
 			log.Println("unlink sock file err: " + err.Error())
 			if os.IsExist(err) {
-				err = syscall.Unlink(Address)
+				err = syscall.Unlink(SockFile)
 			}
 		}
 		log.Println("collector exited")
@@ -41,6 +62,10 @@ func main() {
 	exitSigs := make(chan os.Signal, 1)
 	doExit := make(chan bool, 1)
 	signal.Notify(exitSigs, syscall.SIGINT, syscall.SIGTERM)
+	defer func() {
+		close(exitSigs)
+		close(doExit)
+	}()
 	go func() {
 		<-exitSigs
 		doExit <- true
@@ -48,11 +73,8 @@ func main() {
 	lf, _ := os.OpenFile(LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	log.SetOutput(lf)
 	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
-	/**
-	logics start
-	*/
 	log.Println("collector start")
-	socket, err := net.Listen(Network, Address)
+	socket, err := net.Listen(Network, SockFile)
 	if err != nil {
 		log.Println("socket listen err: " + err.Error())
 		return
@@ -70,6 +92,7 @@ func main() {
 		log.Println("socket waiting for request...")
 		for {
 			clientSock, err := socket.Accept()
+			log.Println("request accept...")
 			if err != nil {
 				if strings.Contains(err.Error(), "use of closed network connection") {
 					break
@@ -90,13 +113,14 @@ func main() {
 					}
 					data := buf[0:dataLen]
 					msg := string(data)
-					log.Println(msg)
+					log.Println("request msg - " + msg)
 					if json.Valid([]byte(msg)) != true {
 						wrong := []byte("error: invalid json format")
 						_, _ = clientSock.Write(wrong)
 						break
 					}
 					go func() {
+
 						err := collector.Run(msg)
 						if err != nil {
 							log.Println("init collector err: " + err.Error())
@@ -113,10 +137,6 @@ func main() {
 			}()
 		}
 	}()
-	/**
-	logics end
-	*/
-
 	if <-doExit {
 		return
 	}

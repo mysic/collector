@@ -9,8 +9,8 @@ type file struct {
 type filePath struct {
 	account string
 	pwd     string
-	path    string
-	folder  []string
+	host    string
+	uri     string
 	suffix  []string
 	saveTo  string
 }
