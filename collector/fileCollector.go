@@ -53,6 +53,7 @@ func (f *fileCollector) run() error {
 				log.Println(err.Error())
 				return
 			}
+			defer sshClient.Close()
 			log.Println("ssh client created")
 			// scp
 			var scpClient scp.Client
