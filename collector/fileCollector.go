@@ -3,7 +3,6 @@ package collector
 import (
 	"errors"
 	"fmt"
-	"github.com/bramvdbogaerde/go-scp"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"net/url"
@@ -56,58 +55,7 @@ func (f *fileCollector) run() error {
 			defer sshClient.Close()
 			log.Println("ssh client created")
 			// scp
-			var scpClient scp.Client
-			scpClient, err = scp.NewClientBySSH(sshClient)
-			if err != nil {
-				log.Println(err.Error())
-				return
-			}
-			defer scpClient.Close()
-			log.Println("scp client created")
-			savePath := val.saveTo + string(os.PathSeparator) + f.data.sourceId
-			isExist, err := f.pathExist(savePath)
-			if err != nil {
-				log.Println(err.Error())
-				return
-			}
-			log.Println("save path exist?", isExist)
-			if !isExist {
-				log.Println("save path create...")
-				fmt.Println(savePath)
-				err := os.MkdirAll(savePath, os.ModePerm)
-				if err != nil {
-					log.Println(err.Error())
-					return
-				}
-			}
-			var saveFileHandle *os.File
-			if len(val.suffix) > 0 {
-				//todo ls -al *.suffix1 *.suffix2
-				// fileNameSet = fileName
-				ls, err := scpClient.Session.Output("pwd;ls -l")
-				if err != nil {
-					log.Println(err.Error())
-				}
-				fmt.Println(string(ls))
-			} else {
-				uriSplit := strings.Split(val.uri, string(os.PathSeparator))
-				lastElement := uriSplit[len(uriSplit)-1]
-				savePath += string(os.PathSeparator) + lastElement
-			}
-			log.Println("save path: ", savePath)
-			saveFileHandle, err = os.OpenFile(savePath, os.O_RDWR|os.O_CREATE, 0777)
-			defer saveFileHandle.Close()
-			err = scpClient.CopyFromRemote(saveFileHandle, val.uri)
-			if err != nil {
-				log.Println(err.Error())
-				fmt.Println(err.Error())
-				return
-			}
-			if err != nil {
-				log.Println(err.Error())
-				log.Println(err.Error())
-				return
-			}
+
 		}(val)
 
 	}
