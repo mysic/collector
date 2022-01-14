@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -32,11 +33,19 @@ func main() {
 		fmt.Println(err.Error())
 		log.Println(err.Error())
 	}
+	_, err = pidFile.WriteString(strconv.Itoa(os.Getpid()))
+	if err != nil {
+		fmt.Println(err.Error())
+		log.Println(err.Error())
+		return
+	}
+	err = pidFile.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+		log.Println(err.Error())
+		return
+	}
 	defer func() {
-		err := pidFile.Close()
-		if err != nil {
-			fmt.Println(err.Error())
-		}
 		err = os.Remove(PidFile)
 		if err != nil {
 			fmt.Println(err.Error())
