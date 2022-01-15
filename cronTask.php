@@ -45,8 +45,7 @@ $msgs = [
 				'pwd' => 'xxxxxxxxx', //decrypt
 				'host' => 'tcp://xxxxxxxxxxxxx',
 				'uri' => '/root',
-				'suffix' => ['mp4', 'doc'],
-				// 'saveTo' => '/tmp/collect/csv/s323sasf23a46456qe2sdfd32x/20220108.doc',
+				'suffix' => ['mp4', 'doc'],// suffix不为空，uri字段为最下级目录
 				'saveTo' => '/tmp/collect'
 			],
 		]
@@ -61,7 +60,7 @@ $msgs = [
 				'pwd' => 'xxxxxxxxxxxxx', //decrypt
 				'host' => 'tcp://xxxxxxxxxxxxxx',
 				'uri' => "/root/install.sh",
-				// 'saveTo' => '/tmp/collect/csv/s323sasf23a46456qe2sdfd32x/20220108.doc',
+				'suffix' => [],// suffix为空，uri字段为文件的完整路径
 				'saveTo' => '/tmp/collect'
 			],
 		]
