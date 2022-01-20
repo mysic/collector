@@ -67,6 +67,7 @@ func main() {
 			}
 		}
 		log.Println("collector exited")
+		fmt.Println("collector exited")
 	}()
 	exitSigs := make(chan os.Signal, 1)
 	doExit := make(chan bool, 1)
@@ -83,6 +84,7 @@ func main() {
 	log.SetOutput(lf)
 	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
 	log.Println("collector start")
+	fmt.Println("collector start")
 	socket, err := net.Listen(Network, SockFile)
 	if err != nil {
 		log.Println("socket listen err: " + err.Error())
@@ -129,7 +131,6 @@ func main() {
 						break
 					}
 					go func() {
-
 						err := collector.Run(msg)
 						if err != nil {
 							log.Println("init collector err: " + err.Error())
@@ -144,6 +145,18 @@ func main() {
 					log.Println("client sock close err: " + err.Error())
 				}
 			}()
+		}
+	}()
+	defer func() {
+		if r := recover(); r != nil {
+			errStr, ok := r.(string)
+			if ok {
+				log.Println("panic err: " + errStr)
+			}
+			err, ok = r.(error)
+			if ok {
+				log.Println("panic err: " + err.Error())
+			}
 		}
 	}()
 	if <-doExit {
