@@ -98,7 +98,6 @@
 // 	],
 //
 // ];
->>>>>>> go-scp-hnakamur
 
 $msgs = [];
 $msgs[] = [
