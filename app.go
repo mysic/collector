@@ -1,8 +1,8 @@
 package main
 
 import (
+	"collector/collector"
 	"encoding/json"
-	"etl/collector"
 	"fmt"
 	"log"
 	"net"
